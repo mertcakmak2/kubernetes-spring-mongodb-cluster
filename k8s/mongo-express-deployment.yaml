@@ -1,0 +1,55 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongo-express
+  name: mongo-express
+spec:
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+        - env:
+            - name: ME_CONFIG_MONGODB_SERVER
+              value: "my-release-mongodb-0.my-release-mongodb-headless.default.svc.cluster.local/db?authSource=admin?replicaSet=rs0"
+            - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
+              value: "true"
+            - name: ME_CONFIG_BASICAUTH_USERNAME
+              value: "root"
+            - name: ME_CONFIG_BASICAUTH_PASSWORD
+              value: "r7yuKkEJS0"
+            - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+              value: "root"
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              value: "r7yuKkEJS0"
+            - name: ME_CONFIG_MONGODB_PORT
+              value: "27017"
+          image: mongo-express:latest
+          imagePullPolicy: Always
+          name: mongo-express
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongo-express
+  name: mongo-express
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8081
+      targetPort: 8081
+      nodePort: 30062
+  type: NodePort
+  selector:
+    app: mongo-express
